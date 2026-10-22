@@ -42,6 +42,16 @@ Web-based PDF editor yang berjalan dengan backend Python lokal. Semua perubahan 
 - **Combine**: tambah beberapa file PDF dan pilih **Export PDF** setelah selesai.
 - **Undo/Redo**: gunakan toolbar atau Ctrl+Z / Ctrl+Y setelah edit tersimpan.
 
+## Sample files
+
+The `samples/` folder contains fictional test documents and images you can use to try text editing, image replacement, and combining PDFs.
+
+- [Text and image editing sample](samples/sample-edit-text-and-images.pdf)
+- [Second PDF for combine and page organization](samples/sample-combine-second-file.pdf)
+- [Sample asset notes](samples/README.md)
+
+These files contain invented names and values only. They are synthetic test assets, not real records. PDF editing results can vary by document, font, and layout.
+
 ## Apa yang diperbaiki dari v2.2?
 
 1. Edit sekarang memilih **fragmen kecil dalam satu baris asli**, bukan satu text block PyMuPDF. Blok PDF sering memuat dua kolom sekaligus, sehingga v2.2 menghapus atau menggeser nilai tabel. Versi ini menjaga baseline dan koordinat glyph lain.
