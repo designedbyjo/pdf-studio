@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="theme-color" content="#111729" />
+<title>PDF Studio 2.3 — Edit Langsung di PDF</title>
+<meta name="description" content="Edit blok teks asli PDF, pulihkan font tersemat, gabung, putar, susun, dan ekspor halaman. Powered by PyMuPDF." />
+<link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <a class="logo" href="/" aria-label="PDF Studio">
+      <span class="logo-emblem"><svg viewBox="0 0 24 24" fill="none"><path d="M7 3.5h7L19 9v11.5H7a2 2 0 0 1-2-2v-13a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="1.7"/><path d="M14 3.5V9h5M8.5 13h7M8.5 16.5h5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span>
+      <span>pdf<span>studio</span><sup>2.3</sup></span>
+    </a>
+    <div class="top-center"><span class="online"></span><span id="fileName">Belum ada dokumen</span><span class="privacy-mini">Local server</span></div>
+    <div class="top-actions">
+      <button id="openBtn" class="btn secondary"><span class="ic">↥</span> Buka PDF</button>
+      <button id="mergeTopBtn" class="btn secondary requires-doc" disabled><span class="ic">⊕</span> Combine</button>
+      <button id="downloadBtn" class="btn primary requires-doc" disabled><span class="ic">↧</span> Export PDF</button>
+    </div>
+  </header>
+  <div class="body">
+    <aside class="sidebar">
+      <div class="side-tabs"><button id="editModeBtn" class="side-tab active">✎ <span>Edit teks</span></button><button id="organizeModeBtn" class="side-tab">▦ <span>Organize</span></button></div>
+      <div class="side-head"><div><span class="overline">DOCUMENT PAGES</span><h3>Halaman <span id="pageCountMini">0</span></h3></div><button id="addBlankBtn" class="tiny-btn requires-doc" title="Tambah halaman kosong" disabled>+</button></div>
+      <div id="pageList" class="page-list"><div class="side-empty">Buka PDF untuk melihat halaman.</div></div>
+      <div class="side-footer"><button id="mergeSideBtn" class="merge-outline requires-doc" disabled>⊕ &nbsp; Gabungkan file PDF</button><div class="security"><span>♧</span><div><b>Controlled on your server</b><p>PDF diproses di backend aplikasi. Hosting publik berarti file dikirim ke server.</p></div></div></div>
+    </aside>
+    <section class="work">
+      <div class="toolbar">
+        <div class="toolbar-left"><div class="edit-mode-picker"><button id="textModeBtn" class="mode-switch active" type="button">✎ Teks</button><button id="imageModeBtn" class="mode-switch" type="button">▧ Gambar</button></div><button id="previewModeBtn" class="mode-switch" type="button">◉ Preview</button><span id="workspaceMode" class="mode-tag">INLINE EDITOR</span><span class="toolbar-line"></span><div class="toolbar-note" id="toolbarNote">Pilih paragraf pada halaman PDF untuk mengedit teks aslinya.</div></div>
+        <div class="toolbar-right"><span id="autosaveStatus" class="autosave-status">✓ Siap diedit</span><button class="icon-btn" id="undoBtn" disabled title="Undo (Ctrl + Z)">↶</button><button class="icon-btn" id="redoBtn" disabled title="Redo (Ctrl + Y)">↷</button><span class="toolbar-line"></span><button class="icon-btn zoom-button" id="zoomOut" title="Perkecil">−</button><span class="zoom-level" id="zoomLabel">100%</span><button class="icon-btn zoom-button" id="zoomIn" title="Perbesar">+</button></div>
+      </div>
+      <div id="scrollArea" class="scroll-area">
+        <div id="welcome" class="welcome">
+          <div class="welcome-art"><span class="glow"></span><div class="sheet back-sheet"></div><div class="sheet front-sheet"><div class="sample-heading"></div><div class="sample-line l1"></div><div class="sample-line l2"></div><div class="sample-line l3"></div><div class="sample-line blue"></div><div class="sample-line l4"></div></div><span class="art-tag">Aa</span><span class="art-check">✓</span></div>
+          <span class="welcome-eyebrow">THE NEXT WAY TO EDIT PDF</span>
+          <h1>Edit isi PDF.<br/><em>Bukan tempel teks.</em></h1>
+          <p>Klik teks langsung di halaman, ketik, dan biarkan perubahan disimpan otomatis sebagai teks PDF yang bisa dicari. Atur ulang dan gabungkan halaman dalam satu workspace.</p>
+          <div class="welcome-buttons"><button id="welcomeOpenBtn" class="btn primary large">↥ &nbsp; Pilih PDF</button><button id="demoBtn" class="btn secondary large">Coba PDF contoh ↗</button></div>
+          <div class="trust"><span>✓ &nbsp; Edit langsung di dokumen</span><span>✓ &nbsp; Reuse font tersemat</span><span>✓ &nbsp; Merge & organize</span></div>
+        </div>
+        <div id="editWorkspace" class="edit-workspace hidden"><div class="paper-topline"><span id="paperLabel">PAGE 01</span><span class="edit-badge">◉ PDF asli · edit langsung</span></div><div id="pageHolder" class="page-holder"><img id="pageImage" alt="Pratinjau halaman PDF" draggable="false"/><div id="textOverlay" class="text-overlay"></div></div><div class="paper-bottomline" id="pageCaption">Klik teks untuk mengedit langsung. Ctrl+Enter menyimpan, Esc membatalkan. Autosave setelah berhenti mengetik.</div></div>
+        <div id="organizeWorkspace" class="organize-workspace hidden"><div class="organize-header"><span class="overline">PAGE MANAGEMENT</span><h2>Susun halaman sesukamu.</h2><p>Seret kartu untuk mengubah urutan. Pilih beberapa halaman untuk ekspor atau hapus sekaligus.</p><div class="organize-actions"><button id="mergeToolbarBtn" class="btn primary">⊕ Gabungkan PDF</button><button id="newPageToolbarBtn" class="btn secondary">+ Halaman kosong</button><button id="selectAllBtn" class="btn secondary">Pilih semua</button><button id="rotateSelectedBtn" class="btn secondary">⟳ Rotasi terpilih</button><button id="duplicateSelectedBtn" class="btn secondary">▣ Duplikat terpilih</button><button id="deleteSelectedBtn" class="btn secondary danger">⌫ Hapus terpilih</button><button id="exportSelectedBtn" class="btn primary">↧ Export terpilih</button></div></div><div id="organizeGrid" class="organize-grid"></div><div id="reorderHint" class="reorder-hint">↔ &nbsp; Drag & drop thumbnail untuk mengurutkan halaman.</div></div>
+      </div>
+      <footer class="statusbar"><span id="statusLine">Siap mengedit dokumen</span><span id="statusPages">PDF Studio v2.3</span></footer>
+    </section>
+    <aside class="inspector">
+      <div class="inspector-title"><span class="overline">INSPECTOR</span><span class="green-point"></span></div>
+      <div id="emptyInspector" class="inspector-content"><div class="inspector-icon">✎</div><h3>Edit paragraf asli</h3><p>Klik area teks pada PDF. Di sini kamu bisa mengubah isi, ukuran, warna, dan lebar paragraf.</p><div class="divider"></div><h4>PAGE ACTIONS</h4><div class="action-grid"><button id="rotateBtn" class="action-button requires-doc" disabled>⟳ <span>Rotate</span></button><button id="duplicateBtn" class="action-button requires-doc" disabled>▣ <span>Duplicate</span></button><button id="moveUpBtn" class="action-button requires-doc" disabled>↑ <span>Move up</span></button><button id="moveDownBtn" class="action-button requires-doc" disabled>↓ <span>Move down</span></button><button id="deletePageBtn" class="action-button danger requires-doc" disabled>⌫ <span>Delete</span></button><button id="insertPageBtn" class="action-button requires-doc" disabled>⊕ <span>Add blank</span></button></div><div class="divider"></div><div class="tip"><b>TIP</b><p>Ctrl+Z undo · Ctrl+Y redo. PDF hasil scan belum bisa diedit teksnya tanpa OCR.</p></div></div>
+      <div id="textInspector" class="text-inspector hidden"><div class="selection-info"><span class="overline">SELECTED TEXT BLOCK</span><h3>Ubah paragraf</h3><span id="blockIndexInfo">Block 01</span></div><label for="editText" class="field-label">Isi paragraf <span class="original-badge">PDF asli</span></label><textarea id="editText" rows="9" placeholder="Ubah teks paragraf asli..."></textarea><div class="field-row"><div class="field"><label for="fontSize">Ukuran (pt)</label><input id="fontSize" type="number" min="5" max="72" step="0.5"></div><div class="field"><label for="textColor">Warna teks</label><div class="color-control"><input id="textColor" type="color"><span id="colorCode">#000000</span></div></div></div><div class="field"><label for="paragraphWidth">Lebar paragraf <span id="widthValue" class="field-trailing">420 pt</span></label><input id="paragraphWidth" type="range" min="60" max="900" step="5"></div><div class="field"><label for="fontOverride">Font pengganti</label><select id="fontOverride"><option value="original">Auto, utamakan font asli</option><option value="helv">Helvetica Regular</option><option value="hebo">Helvetica Bold</option><option value="heit">Helvetica Italic</option><option value="tiro">Times Roman</option><option value="tibo">Times Bold</option><option value="cour">Courier Regular</option><option value="cobo">Courier Bold</option></select></div><div class="font-status"><span class="font-status-ico">Aa</span><div><b id="fontMatch">Mendeteksi font…</b><span id="fontConfidence">Akan memakai font tersemat bila tersedia</span></div></div><div class="save-actions"><button id="saveTextBtn" class="btn primary block">✓ &nbsp; Simpan perubahan teks</button><button id="cancelTextBtn" class="btn secondary block">Batal</button></div><div class="edit-warning"><strong>Catatan layout</strong><p>PDF tidak punya alur paragraf seperti Word. Teks dalam blok ini dibungkus ulang sampai sebelum blok berikutnya. Jika tak muat, aplikasi akan menolak perubahan alih-alih menimpa konten lain.</p></div></div>
+      <div id="organizeInspector" class="organize-inspector hidden"><div class="inspector-icon">▦</div><h3>Organize & combine</h3><p>Atur halaman satu per satu atau pilih beberapa sekaligus. Semua perintah akan berlaku pada PDF keluaran.</p><div class="divider"></div><button id="organizeMergeBtn" class="btn primary block">⊕ &nbsp; Tambah file PDF</button><button id="organizeBlankBtn" class="btn secondary block">+ &nbsp; Tambah halaman kosong</button><div class="divider"></div><div class="tip"><b>DRAG & DROP</b><p>Urutan halaman otomatis berubah begitu kartu dilepaskan di tempat baru.</p></div></div>
+    </aside>
+  </div>
+</div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<div id="busyOverlay" class="busy-overlay hidden"><div class="loading-spinner"></div><span id="busyMessage">Memproses PDF…</span></div>
+<input id="pdfInput" type="file" accept="application/pdf,.pdf" hidden />
+<input id="mergeInput" type="file" accept="application/pdf,.pdf" multiple hidden /><input id="imageInput" type="file" accept="image/png,image/jpeg,.png,.jpg,.jpeg" hidden />
+<script src="/static/app.js" defer></script>
+</body>
+</html>
